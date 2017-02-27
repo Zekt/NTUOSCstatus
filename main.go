@@ -1,26 +1,23 @@
 package main
 
-import (
-	"encoding/xml"
+import(
 	"fmt"
 	"net/http"
-	"strings"
+	"./parse"
 )
 
-func main() {
-	body := strings.NewReader(`oid_4=IGD_LANDevice_i_ConnectedAddress_i_&inst_4=1100&ccp_act=get&num_inst=24`)
-	req, err := http.NewRequest("POST", "http://10.0.87.1/get_set.ccp", body)
+func handler(w http.ResponseWriter, r *http.Request) {
+	l, err := parse.GetList()
 	if err != nil {
-		// handle err
+		fmt.Fprintf(w, "Error occured:", err)
 	}
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	fmt.Fprintf(w, "Connecting devices:\n")
+	for _, device := range l.Device {
+		fmt.Fprintf(w, "%s\n", device.Name.Data)
+	}
+}
 
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		// handle err
-	}
-	buf := make([]byte, 2048)
-	n, _ := resp.Body.Read(buf)
-	fmt.Println(string(buf[:n]))
-	defer resp.Body.Close()
+func main() {
+	http.HandleFunc("/", handler)
+	http.ListenAndServe(":8080", nil)
 }
