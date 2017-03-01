@@ -1,23 +1,44 @@
 package main
 
-import(
+import (
+	"./parse"
+	"encoding/json"
 	"fmt"
 	"net/http"
-	"./parse"
+	"os"
+	"strings"
 )
 
-func handler(w http.ResponseWriter, r *http.Request) {
-	l, err := parse.GetList()
+func listHandler(w http.ResponseWriter, r *http.Request, user, pass string) {
+	body := strings.NewReader("username=" + user + "&password=" + pass)
+	req, err := http.NewRequest("POST", "http://10.0.87.1/login.ccp", body)
 	if err != nil {
-		fmt.Fprintf(w, "Error occured:", err)
+		fmt.Println("Error creating request: ", err)
 	}
-	fmt.Fprintf(w, "Connecting devices:\n")
-	for _, device := range l.Device {
-		fmt.Fprintf(w, "%s\n", device.Name.Data)
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		fmt.Println("Error logging in: ", err)
 	}
+	defer resp.Body.Close()
+	l, err := parse.GetList()
+	fmt.Println(l)
+	if err != nil {
+		fmt.Println("Error parsing list: ", err)
+	}
+	ret, err := json.Marshal(l)
+	if err != nil {
+		fmt.Println("Error generating json: ", err)
+	}
+	fmt.Fprintf(w, "%s\n", ret)
 }
 
 func main() {
-	http.HandleFunc("/", handler)
+	if len(os.Args) < 3 {
+		panic("Not enough arguments!")
+	}
+
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) { http.ServeFile(w, r, "./index.html") })
+	http.HandleFunc("/list/", func(w http.ResponseWriter, r *http.Request) { listHandler(w, r, os.Args[1], os.Args[2]) })
 	http.ListenAndServe(":8080", nil)
 }

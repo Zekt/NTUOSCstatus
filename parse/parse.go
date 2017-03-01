@@ -8,16 +8,16 @@ import (
 )
 
 func GetList() (List, error) {
-	body := strings.NewReader(`oid_4=IGD_LANDevice_i_ConnectedAddress_i_&inst_4=1100&ccp_act=get&num_inst=24`)
+	body := strings.NewReader(`oid_1=IGD_LANDevice_i_ConnectedAddress_i_&inst_1=1100&ccp_act=get&num_inst=100`)
 	req, err := http.NewRequest("POST", "http://10.0.87.1/get_set.ccp", body)
 	if err != nil {
-		return List{}, err
+		fmt.Println(err)
 	}
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return List{}, err
+		fmt.Println(err)
 	}
 	buf := make([]byte, 2048)
 	n, err := resp.Body.Read(buf)
@@ -26,9 +26,7 @@ func GetList() (List, error) {
 	var l List
 	err = xml.Unmarshal(buf[:n], &l)
 	if err != nil {
-		if err.Error() != "EOF" {
-			return List{}, err
-		}
+		fmt.Println(err)
 	}
 	for _, device := range l.Device {
 		fmt.Println("Device:", device.Name.Data)
@@ -43,8 +41,8 @@ type List struct {
 }
 type Device struct {
 	Name name `xml:"igdLanHostStatus_HostName_"`
-	Ip   ip   `xml:"igdLanHostStatus_HostIPv4Address_"`
-	Mac  mac  `xml:"igdLanHostStatus_HostMACAddress_"`
+	IP   ip   `xml:"igdLanHostStatus_HostIPv4Address_"`
+	MAC  mac  `xml:"igdLanHostStatus_HostMACAddress_"`
 }
 
 type name struct {
