@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"io/ioutil"
 )
 
 func GetList() (List, error) {
@@ -19,16 +20,19 @@ func GetList() (List, error) {
 	if err != nil {
 		fmt.Println(err)
 	}
-	buf := make([]byte, 2048)
-	n, err := resp.Body.Read(buf)
-	defer resp.Body.Close()
-
-	var l List
-	err = xml.Unmarshal(buf[:n], &l)
+	buf, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		fmt.Println(err)
 	}
-	for _, device := range l.Device {
+	defer resp.Body.Close()
+
+	var l List
+	err = xml.Unmarshal(buf, &l)
+	if err != nil {
+		fmt.Println(err)
+	}
+	for i, device := range l.Device {
+		l.Device[i].MAC.Data = ""
 		fmt.Println("Device:", device.Name.Data)
 	}
 

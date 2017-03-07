@@ -37,7 +37,6 @@ func main() {
 	if len(os.Args) < 3 {
 		panic("Not enough arguments!")
 	}
-
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) { http.ServeFile(w, r, "./index.html") })
 	http.HandleFunc("/list/", func(w http.ResponseWriter, r *http.Request) { listHandler(w, r, os.Args[1], os.Args[2]) })
 	http.ListenAndServe(":8080", nil)
