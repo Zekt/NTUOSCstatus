@@ -1,33 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="utf-8">
-	<title>Who is now in NTUOSC?</title>
-	<meta name="description" content="Who is now in NTUOSC?">
-	<meta name="author" content="Viktor">
+  <meta charset="utf-8">
+  <title>Who is now in NTUOSC?</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="description" content="Who is now in NTUOSC?">
+  <meta name="author" content="Viktor">
 </head>
 <body>
-	Connecting devices:</br>
-	<div id="list"></div>
-</body>
-<script>
-	var xhr = new window.XMLHttpRequest()
-	xhr.onreadystatechange = function() {
-		//var j = JSON.parse(xhr.response.trim())
-		if(xhr.readyState == xhr.DONE && xhr.status == 200) {
-			var j = JSON.parse(xhr.responseText)
-			for(var i = 0; i < j.Device.length; i++) {
-				var device = document.createElement("div")
-				var content = document.createTextNode(j.Device[i].Name.Data)
-				device.appendChild(content)
-				document.getElementById("list").appendChild(device)
-			}
-		}
-	}
-	setInterval(function() {
-		document.getElementById("list").innerHTML = ""
-		xhr.open('GET', "https://home.ntuosc.org/go/list/")
-		xhr.send(null)
-	}, 3000)
-</script>
+  <h1>Connected devices</h1>
+  <div id="list"></div>
+
+  <script>
+    var xhr = new XMLHttpRequest()
+    xhr.onreadystatechange = function() {
+      if(xhr.readyState == xhr.DONE && xhr.status == 200) {
+        var j = JSON.parse(xhr.responseText)
+        for(var i = 0; i < j.Device.length; i++) {
+          var device = document.createElement("div")
+          var content = document.createTextNode(j.Device[i].Name.Data)
+          device.appendChild(content)
+          document.getElementById("list").appendChild(device)
+        }
+      }
+    }
+    setInterval(function() {
+      document.getElementById("list").innerHTML = ""
+      xhr.open('GET', "https://home.ntuosc.org/go/list/")
+      xhr.send(null)
+    }, 3000)
+  </script>
+  </body>
 </html>
