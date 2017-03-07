@@ -15,6 +15,7 @@
     var xhr = new XMLHttpRequest()
     xhr.onreadystatechange = function() {
       if(xhr.readyState == xhr.DONE && xhr.status == 200) {
+        document.getElementById("list").innerHTML = ""
         var j = JSON.parse(xhr.responseText)
         for(var i = 0; i < j.Device.length; i++) {
           var device = document.createElement("div")
@@ -25,7 +26,6 @@
       }
     }
     setInterval(function() {
-      document.getElementById("list").innerHTML = ""
       xhr.open('GET', "https://home.ntuosc.org/go/list/")
       xhr.send(null)
     }, 3000)
