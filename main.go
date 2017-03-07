@@ -15,7 +15,6 @@ func listHandler(w http.ResponseWriter, r *http.Request, user, pass string) {
 	if err != nil {
 		fmt.Println("Error creating request: ", err)
 	}
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		fmt.Println("Error logging in: ", err)
@@ -30,7 +29,8 @@ func listHandler(w http.ResponseWriter, r *http.Request, user, pass string) {
 	if err != nil {
 		fmt.Println("Error generating json: ", err)
 	}
-	fmt.Fprintf(w, "%s\n", ret)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(ret)
 }
 
 func main() {
